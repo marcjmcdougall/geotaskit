@@ -1,0 +1,15 @@
+<resources>
+    
+    <!-- Task item: General preferences -->
+    <dimen name="item_task_height">60dp</dimen>
+    <dimen name="item_task_padding">4dp</dimen>
+    
+    <!-- Task item: Children preferences -->
+    <dimen name="item_task_view_priority_width">10dp</dimen>
+    <dimen name="item_task_text_name_height">24dp</dimen>
+    <dimen name="item_task_text_description_height">20dp</dimen>
+    <dimen name="item_task_text_name_font_size">15sp</dimen>
+    <dimen name="item_task_text_description_font_size">13sp</dimen>
+    <dimen name="item_task_text_miles_font_size">20sp</dimen>
+
+</resources>
