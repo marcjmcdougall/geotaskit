@@ -3,7 +3,9 @@ package com.cis6930.geotaskit.fragment;
 /*
  * This class is the Map Fragment that shows all the tasks on a Google Map
  */
-// TODO: Center map on user's current location every time this fragment gains focus
+// TODO: Add a new task on long click on Map
+// TODO: Beautify popup and add functionality on clicking different popup elements
+// TODO: How do we fetch the task information from the database?
 
 import java.util.HashMap;
 
@@ -16,7 +18,6 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.cis6930.geotaskit.R;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -30,8 +31,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MyMapFragment extends Fragment {
+  //create some dummy data for demo
   static final LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
   static final String[] locationNamesArray = { "Library West", "Plaza of the Americas" };
+
   private GoogleMap map;
   private static View view;
   private LayoutInflater inflater;
