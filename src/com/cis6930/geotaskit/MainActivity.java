@@ -48,11 +48,11 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 
     //based on the option selected in the navigation list, set the fragment to be either ListFragment or MyMapFragment
     switch (itemPosition) {
-      case 1:
+      case 0:
         //"List" is selected
         f = new ListFragment();
         break;
-      case 0:
+      case 1:
         //"Map" is selected
         f = new MyMapFragment();
         break;
