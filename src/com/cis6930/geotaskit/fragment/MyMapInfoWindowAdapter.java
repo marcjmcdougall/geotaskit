@@ -10,14 +10,13 @@ import com.cis6930.geotaskit.R;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
-
 public class MyMapInfoWindowAdapter implements InfoWindowAdapter {
   
   private View view;
-  private HashMap <Marker, TaskInfo> taskHash;
+  private HashMap <Marker, MyMapTaskInfo> taskHash;
 
-  public MyMapInfoWindowAdapter(LayoutInflater inflater, HashMap<Marker, TaskInfo> taskHash) {
-    this.view = inflater.inflate(R.layout.mymapitemizedpopup_layout, null);
+  public MyMapInfoWindowAdapter(LayoutInflater inflater, HashMap<Marker, MyMapTaskInfo> taskHash) {
+    this.view = inflater.inflate(R.layout.mymapmarkerpopup_layout, null);
     this.taskHash = taskHash;
   }
 
@@ -30,7 +29,7 @@ public class MyMapInfoWindowAdapter implements InfoWindowAdapter {
   @Override
   public View getInfoContents(Marker marker) {
     //retrieve the task information and display on the popup
-    TaskInfo thisTask = taskHash.get(marker);
+    MyMapTaskInfo thisTask = taskHash.get(marker);
     ((TextView) view.findViewById(R.id.balloon_item_title)).setText(thisTask.getTaskDescription());
     return view;
   }
