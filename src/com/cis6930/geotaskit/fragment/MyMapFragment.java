@@ -9,6 +9,8 @@ package com.cis6930.geotaskit.fragment;
 
 import java.util.HashMap;
 
+import android.app.Activity;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,11 +20,13 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.cis6930.geotaskit.R;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -30,18 +34,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MyMapFragment extends Fragment {
-  //create some dummy data for demo
+public class MyMapFragment extends Fragment implements LocationSource, LocationListener {
+
+  // create some dummy data for demo
   static final LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
   static final String[] locationNamesArray = { "Library West", "Plaza of the Americas" };
 
   private GoogleMap map;
   private static View view;
   private LayoutInflater inflater;
-  protected LocationManager locationManager;
+  private OnLocationChangedListener listener;
   private HashMap<Marker, MyMapTaskInfo> taskHash; // will be used to retrieve
                                                    // task information when the
                                                    // popup is shown
+  private LocationManager locationManager;
+  private Criteria locationCriteria;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,17 +81,49 @@ public class MyMapFragment extends Fragment {
     try {
       MapsInitializer.initialize(getActivity());
 
-      map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_map_map)).getMap();
+      if (map == null)
+        map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_map_map)).getMap();
 
       if (map != null) {
+        taskHash = new HashMap<Marker, MyMapTaskInfo>(); // will be used to
+                                                         // retrieve task
+                                                         // information when the
+                                                         // popup is shown
+
         // set zoom and other UI stuff on map
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setCompassEnabled(true);
-        map.setMyLocationEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setRotateGesturesEnabled(true);
 
-        taskHash = new HashMap<Marker, MyMapTaskInfo>();
+        // enable location tracking in map
+        map.setLocationSource(this); // we use our own locationsource (this
+                                     // class) instead of Google Maps default
+                                     // location source because with the default
+                                     // source, the map keeps centering
+                                     // on the current location even after the
+                                     // user moves the map around manually
+        map.setMyLocationEnabled(true);
+
+        locationManager = (LocationManager) getActivity().getSystemService(Activity.LOCATION_SERVICE);
+        locationCriteria = new Criteria();
+        locationCriteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        locationCriteria.setPowerRequirement(Criteria.POWER_LOW);
+        locationCriteria.setBearingRequired(true);
+        locationCriteria.setSpeedRequired(true);
+
+        // Get a coarse fix very fast so impatient users at least see a
+        // reasonably accurate location on their maps
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 20000, 50, this); // TODO:
+                                                                                                   // change
+                                                                                                   // the
+                                                                                                   // time
+                                                                                                   // criteria
+                                                                                                   // to
+                                                                                                   // what
+                                                                                                   // the
+                                                                                                   // user
+                                                                                                   // sets
 
         // add the markers
         for (int i = 0; i < locationCoordArray.length; i++) {
@@ -92,45 +131,66 @@ public class MyMapFragment extends Fragment {
           taskHash.put(myMarker, new MyMapTaskInfo(locationNamesArray[i]));
         }
 
-        // add an InfoWindowAdapter that will handle the popups for the markers
-        MyMapInfoWindowAdapter myInfoWindowAdapter = new MyMapInfoWindowAdapter(this.inflater, this.taskHash);
+        // add an InfoWindowAdapter that will handle the marker popups
+        MyMapPopupHandler myInfoWindowAdapter = new MyMapPopupHandler(this.inflater, this.taskHash);
         map.setInfoWindowAdapter(myInfoWindowAdapter);
-
-        // center the map on the user's current location
-        GingerbreadLastLocationFinder myLocFinder = new GingerbreadLastLocationFinder(getActivity());
-        myLocFinder.setChangedLocationListener(new LocationListener(){
-
-          @Override
-          public void onLocationChanged(Location loc) {
-            // Toast.makeText(getActivity().getBaseContext(), loc.getLatitude() + "" + loc.getLongitude(), Toast.LENGTH_LONG).show();
-            map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())));
-          }
-
-          @Override
-          public void onProviderDisabled(String provider) {
-          }
-
-          @Override
-          public void onProviderEnabled(String provider) {
-          }
-
-          @Override
-          public void onStatusChanged(String provider, int status, Bundle extras) {
-          }
-          
-        });
-        myLocFinder.forceLocRefreshOnce();
-
-        //Toast.makeText(getActivity().getBaseContext(), myLoc.getLatitude() + "" + myLoc.getLongitude(), Toast.LENGTH_LONG).show();
-        //map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(myLoc.getLatitude(), myLoc.getLongitude())));
-
-        // Zoom in, animating the camera.
-        map.animateCamera(CameraUpdateFactory.zoomTo(17), 500, null);
       }
     }
     catch (GooglePlayServicesNotAvailableException e) {
       e.printStackTrace();
     }
+  }
+
+  // overrides of LocationSource
+  @Override
+  public void activate(OnLocationChangedListener listener) {
+    this.listener = listener;
+  }
+
+  @Override
+  public void deactivate() {
+    this.listener = null;
+  }
+
+  // overrides of LocationListener
+  @Override
+  public void onLocationChanged(Location loc) {
+    if (this.listener != null) {
+      this.listener.onLocationChanged(loc);
+      map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), 17));
+      if (locationCriteria.getAccuracy() == Criteria.ACCURACY_COARSE) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+          Toast.makeText(getActivity(), R.string.getting_gps_infomsg, Toast.LENGTH_LONG).show();
+          locationCriteria.setAccuracy(Criteria.ACCURACY_FINE);
+          locationManager.requestLocationUpdates(locationManager.getBestProvider(locationCriteria, true), 20000, 50, this); // TODO:
+                                                                                                                            // change
+                                                                                                                            // the
+                                                                                                                            // time
+                                                                                                                            // criteria
+                                                                                                                            // to
+                                                                                                                            // what
+                                                                                                                            // the
+                                                                                                                            // user
+                                                                                                                            // sets
+        }
+        else {
+          Toast.makeText(getActivity(), R.string.enable_gps_infomsg, Toast.LENGTH_LONG).show();
+        }
+      }
+    }
+  }
+
+  @Override
+  public void onProviderDisabled(String provider) {
+    Toast.makeText(getActivity(), "No providers found", Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public void onProviderEnabled(String provider) {
+  }
+
+  @Override
+  public void onStatusChanged(String provider, int status, Bundle extras) {
   }
 
 }
