@@ -38,7 +38,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   private GoogleMap map;
   private static View view;
   private LayoutInflater inflater;
-  private OnLocationChangedListener listener;
+  private OnLocationChangedListener listener; // right now, just a dummy class used to display the dot at the location
+                                              // if you want actual location-tracking, make this class do something!
   private HashMap<Marker, MyMapTaskInfo> taskHash; // will be used to retrieve
                                                    // task information when the
                                                    // popup is shown
@@ -168,16 +169,34 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
                                                                                                                             // user
                                                                                                                             // sets
         }
-        else {
-          Toast.makeText(getActivity(), R.string.enable_gps_infomsg, Toast.LENGTH_LONG).show();
+        else { // we found the most accurate loc possible (using network; GPS is
+               // off)
+          Toast.makeText(getActivity(), R.string.gps_disabled_infomsg, Toast.LENGTH_LONG).show();
+          // we need the location only when the map is opened the first time
+          // no more updates needed
+          locationManager.removeUpdates(this);
+
         }
+      }
+      else if (locationCriteria.getAccuracy() == Criteria.ACCURACY_FINE) { // we
+                                                                           // found
+                                                                           // the
+                                                                           // most
+                                                                           // accurate
+                                                                           // loc
+                                                                           // possible
+                                                                           // (using
+                                                                           // GPS)
+        // we need the location only when the map is opened the first time
+        // no more updates needed
+        locationManager.removeUpdates(this);
       }
     }
   }
 
   @Override
   public void onProviderDisabled(String provider) {
-    Toast.makeText(getActivity(), "No providers found", Toast.LENGTH_SHORT).show();
+    Toast.makeText(getActivity(), "No location providers found", Toast.LENGTH_SHORT).show();
   }
 
   @Override
