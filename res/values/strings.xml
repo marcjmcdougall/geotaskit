@@ -3,8 +3,8 @@
 
     <string name="app_name">GeoTaskIt</string>
     <string name="action_settings">Settings</string>
-    <string name="enable_gps_infomsg">Please enable GPS for more accuracy</string>
-    <string name="getting_gps_infomsg">Getting more accurate location...</string>
+    <string name="getting_gps_infomsg">Awaiting GPS fix...</string>
+    <string name="gps_disabled_infomsg">GPS is disabled</string>
     
     <string-array name="actionbar_navigation_list">
         <item >List</item>
