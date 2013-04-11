@@ -10,12 +10,12 @@ import com.cis6930.geotaskit.R;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
-public class MyMapInfoWindowAdapter implements InfoWindowAdapter {
+public class MyMapPopupHandler implements InfoWindowAdapter {
   
   private View view;
   private HashMap <Marker, MyMapTaskInfo> taskHash;
 
-  public MyMapInfoWindowAdapter(LayoutInflater inflater, HashMap<Marker, MyMapTaskInfo> taskHash) {
+  public MyMapPopupHandler(LayoutInflater inflater, HashMap<Marker, MyMapTaskInfo> taskHash) {
     this.view = inflater.inflate(R.layout.mymapmarkerpopup_layout, null);
     this.taskHash = taskHash;
   }
