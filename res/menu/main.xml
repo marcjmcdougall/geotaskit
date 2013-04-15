@@ -1,9 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_add"
+        android:id="@+id/action_refresh"
         android:showAsAction="always"
-        android:icon="@android:drawable/ic_input_add"/>
+        android:title="@string/action_refresh"
+        android:icon="@android:drawable/ic_popup_sync"/>
+    
+    <item
+        android:id="@+id/action_add"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_add"
+        android:icon="@android:drawable/ic_menu_add"/>
 
 	<item
         android:id="@+id/action_settings"

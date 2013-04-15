@@ -11,12 +11,19 @@ import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
 public class MyMapPopupHandler implements InfoWindowAdapter {
-  
+
   private View view;
-  private HashMap <Marker, MyMapTaskInfo> taskHash;
+  private HashMap<Marker, MyMapTaskInfo> taskHash;
 
   public MyMapPopupHandler(LayoutInflater inflater, HashMap<Marker, MyMapTaskInfo> taskHash) {
-    this.view = inflater.inflate(R.layout.mymapmarkerpopup_layout, null);
+    this.view = inflater.inflate(R.layout.mymapmarkerpopup, null); // this is
+                                                                   // the xml
+                                                                   // file that
+                                                                   // defines
+                                                                   // the layout
+                                                                   // of the
+                                                                   // popup
+                                                                   // balloon
     this.taskHash = taskHash;
   }
 
@@ -28,10 +35,13 @@ public class MyMapPopupHandler implements InfoWindowAdapter {
 
   @Override
   public View getInfoContents(Marker marker) {
-    //retrieve the task information and display on the popup
+    // retrieve the task information and display on the popup
     MyMapTaskInfo thisTask = taskHash.get(marker);
-    ((TextView) view.findViewById(R.id.balloon_item_title)).setText(thisTask.getTaskDescription());
+    ((TextView) (view.findViewById(R.id.balloon_task_title))).setText(thisTask.getTaskTitle());
+    ((TextView) (view.findViewById(R.id.balloon_task_description))).setText(thisTask.getTaskDescription());
+    View balloon_priority = view.findViewById(R.id.balloon_task_priority);
+    balloon_priority.setBackgroundColor(thisTask.getTaskPriority());
     return view;
   }
-  
+
 }

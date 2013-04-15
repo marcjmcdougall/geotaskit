@@ -1,0 +1,79 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".EditorActivity" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            
+            <View
+                android:id="@+id/editor_view_priority_indicator"
+                android:layout_height="@dimen/activity_editor_view_priority_indicator_height"
+                android:layout_width="match_parent"/>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/editor_priority_label"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+			<Spinner
+			    android:id="@+id/editor_spinner_priority"
+			    android:layout_height="wrap_content"
+			    android:layout_width="match_parent"
+			    android:layout_marginLeft="@dimen/activity_editor_subitem_margin"/>
+			
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/editor_info_label"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+			
+            <EditText
+                android:id="@+id/editor_edit_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/editor_edit_name_hint"
+                android:inputType="text"
+                android:layout_marginLeft="@dimen/activity_editor_subitem_margin"/>
+
+            <EditText
+                android:id="@+id/editor_edit_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/editor_edit_description_hint"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="@dimen/activity_editor_subitem_margin"/>
+            
+            <RadioGroup
+                android:id="@+id/editor_radiogroup_notifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkedButton="@+id/editor_radiobutton_notifications_normal">
+                
+				<TextView
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:text="@string/editor_notifications_label"
+	                android:textAppearance="?android:attr/textAppearanceMedium" />
+                
+                <RadioButton
+                    android:id="@id/editor_radiobutton_notifications_normal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:text="@string/editor_radiobutton_notifications_normal"/>
+                <RadioButton
+                    android:id="@+id/editor_radiobutton_notifications_important"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:text="@string/editor_radiobutton_notifications_important"/>
+            </RadioGroup>
+        </LinearLayout>
+</ScrollView>

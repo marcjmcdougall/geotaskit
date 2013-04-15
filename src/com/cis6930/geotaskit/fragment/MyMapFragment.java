@@ -7,14 +7,17 @@ package com.cis6930.geotaskit.fragment;
 // TODO: Beautify popup and add functionality on clicking different popup elements
 // TODO: How do we fetch the task information from the database?
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -23,9 +26,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.cis6930.geotaskit.R;
+import com.cis6930.geotaskit.Task;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,17 +39,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MyMapFragment extends Fragment implements LocationSource, LocationListener {
+public class MyMapFragment extends Fragment implements LocationSource, LocationListener, OnInfoWindowClickListener {
 
   // create some dummy data for demo
-  static final LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
-  static final String[] locationNamesArray = { "Library West", "Plaza of the Americas" };
+
+  ArrayList<Task> taskList = null;
 
   private GoogleMap map;
   private static View view;
   private LayoutInflater inflater;
-  private OnLocationChangedListener listener; // right now, just a dummy class used to display the dot at the location
-                                              // if you want actual location-tracking, make this class do something!
+  private OnLocationChangedListener listener; // right now, just a dummy class
+                                              // used to display the dot at the
+                                              // location
+                                              // if you want actual
+                                              // location-tracking, make this
+                                              // class do something!
   private HashMap<Marker, MyMapTaskInfo> taskHash; // will be used to retrieve
                                                    // task information when the
                                                    // popup is shown
@@ -86,6 +95,19 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_map_map)).getMap();
 
       if (map != null) {
+        // Currently populated with dummy task data
+        // MARC PUT YOUR CODE TO FETCH TASK INFO FROM DB HERE
+        // Note that there is more code that you need to change further on down. Please search for
+        // your name in the file.
+        // Note also that the Task object (Task.java) I received from Armando doesn't have a location in
+        // it so I've hardcoded locations in an array. I'm assuming you've added the location to the task class. If so, you
+        // can get rid of the locations array and simply init the location from the Task object. The locations array is
+        // locationCoordArray
+        taskList = new ArrayList<Task>();
+        taskList.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj", "Take a pic of an aligator and send it to him", "3.2"));
+        taskList.add(new Task(Task.PRIORITY_LOW, "Visit John", "Pay a visit whenever possible", "1.3"));
+        LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
+
         taskHash = new HashMap<Marker, MyMapTaskInfo>(); // will be used to
                                                          // retrieve task
                                                          // information when the
@@ -98,7 +120,7 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         map.getUiSettings().setRotateGesturesEnabled(true);
 
         // enable location tracking in map
-        map.setLocationSource(this); // we use our own locationsource (this
+        map.setLocationSource(this); // we use our own LocationSource (this
                                      // class) instead of Google Maps default
                                      // location source because with the default
                                      // source, the map keeps centering
@@ -115,26 +137,28 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
 
         // Get a coarse fix very fast so impatient users at least see a
         // reasonably accurate location on their maps
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 20000, 50, this); // TODO:
-                                                                                                   // change
-                                                                                                   // the
-                                                                                                   // time
-                                                                                                   // criteria
-                                                                                                   // to
-                                                                                                   // what
-                                                                                                   // the
-                                                                                                   // user
-                                                                                                   // sets
+        // update every refreshInterval milliseconds. We read this value from
+        // the user's settings. A default value of 1 minute is used.
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int refreshInterval = Integer.parseInt(sharedPrefs.getString(getString(R.string.pref_user_frequency_key), "1")) * 60 * 1000;
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, refreshInterval, 50, this);
 
-        // add the markers
-        for (int i = 0; i < locationCoordArray.length; i++) {
-          Marker myMarker = map.addMarker(new MarkerOptions().position(locationCoordArray[i]).title(locationNamesArray[i]).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-          taskHash.put(myMarker, new MyMapTaskInfo(locationNamesArray[i]));
+        // add a marker for each task
+        int i = 0;
+        for (Task item : taskList) {
+          // MARC YOU ALSO NEED TO MODIFY THIS CODE
+          // Here, we're actually adding the markers to the map
+          // As I said before, I'm using hardcoded locations (locationCoordArray) but you might want to pull the
+          // location from your Task object (Task.java) if you've added location fields to it.
+          Marker myMarker = map.addMarker(new MarkerOptions().position(locationCoordArray[i]).title(item.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+          taskHash.put(myMarker, new MyMapTaskInfo(item.name, item.description, item.color_priority));
+          i++;
         }
 
         // add an InfoWindowAdapter that will handle the marker popups
-        MyMapPopupHandler myInfoWindowAdapter = new MyMapPopupHandler(this.inflater, this.taskHash);
-        map.setInfoWindowAdapter(myInfoWindowAdapter);
+        map.setInfoWindowAdapter(new MyMapPopupHandler(this.inflater, this.taskHash));
+        map.setOnInfoWindowClickListener(this); //register a listener that will respond to clicks on the marker's popup window
+                                                //when the popup window is clicked, we simply transition to EditorActivity
       }
     }
     catch (GooglePlayServicesNotAvailableException e) {
@@ -210,6 +234,21 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
 
   @Override
   public void onStatusChanged(String provider, int status, Bundle extras) {
+  }
+
+  @Override
+  public void onInfoWindowClick(Marker marker) {
+    // MARC this is the final piece of code you need to write. This is actually what I spoke
+    // to you on the phone about. I haven't done it because, as of now, EditorActivity does
+    // not have any hook to populate its fields.
+    // What's happening here:
+    // We end up here when we click on a marker's popup window. What we want is to open up
+    // an edit activity for the task so the user can edit the task details. This can be done by
+    // passing the task information to EditorActivity (once you've added hooks to EditorActivity to  
+    // populate its fields).
+    // To get the associated task info, please call taskHash.get(marker) and this will return you a
+    // Task object with the tasks's title, description, priority etc.
+    // Once you have the Task's info, you need to pass it to Armando's EditorActivity activity.
   }
 
 }
