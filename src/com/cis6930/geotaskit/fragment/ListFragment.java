@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
 import com.cis6930.geotaskit.R;
@@ -16,7 +18,9 @@ import com.cis6930.geotaskit.backends.DatabaseInterface;
 
 public class ListFragment extends Fragment{
 	
-	ArrayList<Task> items;
+	private ArrayList<Task> items;
+	
+	private ListView list;
 	
 	private DatabaseInterface db;
 	private TaskAdapter adapter;
@@ -24,12 +28,26 @@ public class ListFragment extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.fragment_list, container, false);
+		final View view = inflater.inflate(R.layout.fragment_list, container, false);
 
 		adapter = new TaskAdapter(getActivity(), R.layout.item_task, items);
 		
-		ListView list = (ListView) view.findViewById(R.id.fragment_list_list);
+		list = (ListView) view.findViewById(R.id.fragment_list_list);
 		list.setAdapter(adapter);
+		
+		list.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				
+				db.removeTask(items.get(arg2));
+				items.remove(arg2);
+				
+				adapter.notifyDataSetChanged();
+				
+				return true;
+			}
+		});
 		
 		return view;
 	}
@@ -37,7 +55,6 @@ public class ListFragment extends Fragment{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		
-		//just for when the fragment is created, fill the ArrayList with false Task items for demonstrative purposes
 		items = new ArrayList<Task>();
 		db = new DatabaseInterface(getActivity().getApplicationContext());
 		

@@ -27,10 +27,12 @@ import android.widget.Toast;
 
 import com.cis6930.geotaskit.R;
 import com.cis6930.geotaskit.Task;
+import com.cis6930.geotaskit.backends.DatabaseInterface;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -44,6 +46,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   // create some dummy data for demo
 
   ArrayList<Task> taskList = null;
+  
+  private DatabaseInterface db;
 
   private GoogleMap map;
   private static View view;
@@ -88,13 +92,17 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   // we use onActivityCreated instead of onCreate because we can't use
   // findFragmentById until the view has been inflated
   public void onActivityCreated(Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
+   
+	  super.onActivityCreated(savedInstanceState);
+	  
+	  db = new DatabaseInterface(getActivity().getApplicationContext());
+	  
     try {
       MapsInitializer.initialize(getActivity());
 
       if (map == null)
         map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_map_map)).getMap();
-
+      
       if (map != null) {
         // Currently populated with dummy task data
         // MARC PUT YOUR CODE TO FETCH TASK INFO FROM DB HERE
@@ -104,11 +112,22 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         // it so I've hardcoded locations in an array. I'm assuming you've added the location to the task class. If so, you
         // can get rid of the locations array and simply init the location from the Task object. The locations array is
         // locationCoordArray
-        taskList = new ArrayList<Task>();
+        taskList = db.getTasks();
         taskList.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj", "Take a pic of an aligator and send it to him", "3.2", 29.65133f, -82.342822f));
         taskList.add(new Task(Task.PRIORITY_LOW, "Visit John", "Pay a visit whenever possible", "1.3", 29.650377f, -82.342857f));
 //        LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
-
+        
+        map.setOnMapClickListener(new OnMapClickListener() {
+			
+			@Override
+			public void onMapClick(LatLng point) {
+				
+				Toast.makeText(getActivity().getApplicationContext(), "CLICK DETECTED", Toast.LENGTH_SHORT).show();
+				
+				taskList.add(new Task(Task.PRIORITY_HIGH, "TEST MAP", "TEST", "" + 0.0f, (float) point.latitude, (float) point.longitude)); 
+			}
+		});
+        
         taskHash = new HashMap<Marker, MyMapTaskInfo>(); // will be used to
                                                          // retrieve task
                                                          // information when the
