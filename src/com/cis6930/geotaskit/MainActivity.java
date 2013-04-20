@@ -17,8 +17,11 @@ import com.cis6930.geotaskit.fragment.MyMapFragment;
 
 public class MainActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener{
 
+	Fragment f;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
@@ -26,20 +29,34 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 		Context context = getSupportActionBar().getThemedContext();
 		
 		//build the list of items in the spinner based on a resource AND set the view resource to the spinner with the adapter
-    ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(context, R.array.actionbar_navigation_list, R.layout.sherlock_spinner_item);
-    list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(context, R.array.actionbar_navigation_list, R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         
-    //set the type of navigation and then set the list adapter along with the listener for whenever an option from the drop-down is selected
+		//set the type of navigation and then set the list adapter along with the listener for whenever an option from the drop-down is selected
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 	}
 	
 	@Override
+	protected void onResume() {
+		
+		System.out.println("**Resuming Now**");
+		
+		if(f != null){
+			
+			f.onResume();
+		}
+		
+		super.onResume();
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		
 		//we inflate the menu based on the R.menu.main xml file
 		MenuInflater inflater = getSupportMenuInflater();
-	  inflater.inflate(R.menu.main, menu);
-	  return true;
+		inflater.inflate(R.menu.main, menu);
+		return true;
 	}
 	
 	// invoke the settings activity or the add/edit task activity
@@ -49,6 +66,10 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 		
 		//switch the ids for respective execution
 		switch(item.getItemId()){
+		
+			case R.id.action_refresh:
+				f.onResume();
+				break;
 			case R.id.action_add:
 				startActivity(new Intent(this, EditorActivity.class));
 				break;
@@ -66,7 +87,7 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 		//called whenever a navigation item is selected from the drop-down
 		
 		//declare the fragment that will replace the one that is currently shown 
-		Fragment f = null;
+		f = null;
 		
 		//based on the option selected in the navigation list, set the fragment to be either ListFragment or MapFragment
 		switch(itemPosition){
@@ -86,6 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 		ft.replace(R.id.main_content, f);
 		//and commit changes to the FragmentTransaction object
 		ft.commit();
+		
 		return false;
 	}
 }

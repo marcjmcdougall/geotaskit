@@ -1,8 +1,5 @@
 package com.cis6930.geotaskit.backends;
 
-import com.cis6930.geotaskit.Task;
-
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
@@ -14,17 +11,19 @@ public class OpenHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     
     // The name of the database
-    public static final String DICTIONARY_TABLE_NAME = "tasks";
+    public static final String DICTIONARY_TABLE_NAME = "tasks2";
     
     // Public variable that keeps track of the total number of columns
-    public static final int COLUMN_TOTAL = 4;
+    public static final int COLUMN_TOTAL = 6;
     
     // The keys for the values that will be stored
     public static final String KEY_PRIORITY = "priority";
     public static final String KEY_DESCRIPTION_SHORT = "short_description";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_DISTANCE = "distance";
-	
+    public static final String KEY_LATTITUDE = "lattitude";
+    public static final String KEY_LONGITUDE = "longitude";
+    
     // Create the table only if it does not already exist
     private static final String DICTIONARY_TABLE_CREATE =
             
@@ -32,7 +31,14 @@ public class OpenHelper extends SQLiteOpenHelper {
             KEY_PRIORITY + " INT13, " +
             KEY_DESCRIPTION_SHORT + " TEXT, " +
             KEY_DESCRIPTION + " TEXT, " +
-            KEY_DISTANCE + " TEXT);";
+            KEY_DISTANCE + " TEXT, " + 
+            KEY_LATTITUDE + " FLOAT, " +
+            KEY_LONGITUDE + " FLOAT);";
+    
+    private static final String DICTIONARY_TABLE_DROP =
+    		
+    		"DROP TABLE IF EXISTS " +
+    		DICTIONARY_TABLE_NAME;
 	
     public OpenHelper(Context context){
     	
@@ -56,6 +62,9 @@ public class OpenHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		
+		// Execute the SQL command to drop the table (if it does not already exist)
+		db.execSQL(DICTIONARY_TABLE_DROP);
+		
 		// Execute the SQL command to create the table (if it does not already exist)
 		db.execSQL(DICTIONARY_TABLE_CREATE);
 	}
@@ -63,6 +72,6 @@ public class OpenHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
-		// Do nothing
+		// Currently, do nothing
 	}
 }

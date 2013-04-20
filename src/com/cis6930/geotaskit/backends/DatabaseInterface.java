@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.SyncStateContract.Helpers;
 
 import com.cis6930.geotaskit.Task;
 
@@ -38,6 +39,8 @@ public class DatabaseInterface {
 		columnsToRead[1] = OpenHelper.KEY_DESCRIPTION_SHORT;
 		columnsToRead[2] = OpenHelper.KEY_DESCRIPTION;
 		columnsToRead[3] = OpenHelper.KEY_DISTANCE;
+		columnsToRead[4] = OpenHelper.KEY_LATTITUDE;
+		columnsToRead[5] = OpenHelper.KEY_LONGITUDE;
 		
 		String orderBy = OpenHelper.KEY_PRIORITY;
 		
@@ -63,6 +66,8 @@ public class DatabaseInterface {
 		columnsToRead[1] = OpenHelper.KEY_DESCRIPTION_SHORT;
 		columnsToRead[2] = OpenHelper.KEY_DESCRIPTION;
 		columnsToRead[3] = OpenHelper.KEY_DISTANCE;
+		columnsToRead[4] = OpenHelper.KEY_LATTITUDE;
+		columnsToRead[5] = OpenHelper.KEY_LONGITUDE;
 		
 		// Note that there WHERE is excluded for our purposes, just assume that it is the first word in the String
 		String whereClause = OpenHelper.KEY_DESCRIPTION + " LIKE %" + keyword + "% OR " + OpenHelper.KEY_DESCRIPTION_SHORT + " LIKE %" + keyword + "%";
@@ -99,7 +104,8 @@ public class DatabaseInterface {
 		while(!returnData.isAfterLast()){
 			
 			// Add the new Task to the ArrayList
-			output.add(count, new Task(returnData.getInt(0), returnData.getString(1), returnData.getString(2), returnData.getString(3)));
+			// Data format is (int, String, String, String, float, float)
+			output.add(count, new Task(returnData.getInt(0), returnData.getString(1), returnData.getString(2), returnData.getString(3), returnData.getFloat(4), returnData.getFloat(5)));
 			
 			// Advance the Cursor
 			returnData.moveToNext();

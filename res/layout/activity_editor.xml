@@ -75,5 +75,12 @@
                     android:layout_width="match_parent"
                     android:text="@string/editor_radiobutton_notifications_important"/>
             </RadioGroup>
+            
+            <Button 
+                android:id="@+id/editor_button_add"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/editor_button_add"/>
+            
         </LinearLayout>
 </ScrollView>

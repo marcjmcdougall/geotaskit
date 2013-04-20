@@ -13,15 +13,22 @@ public class Task {
 	public String name;
 	public String description;
 	
+	public float lattitude;
+	public float longitude;
+	
 	//add the actual object that handles the coordinates!
 	//for the time being... for demo purposes:
 	public String miles_left;
 	
-	public Task(int priority, String name, String description, String miles_left) {
+	public Task(int priority, String name, String description, String miles_left, float lattitude, float longitude) {
+		
 		this.color_priority = priority;
 		this.name = name;
 		this.description = description;
 		this.miles_left = miles_left;
+		
+		this.lattitude = lattitude;
+		this.longitude = longitude;
 	}
 	
 }

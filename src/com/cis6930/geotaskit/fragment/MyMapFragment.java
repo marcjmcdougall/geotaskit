@@ -77,7 +77,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
       view = inflater.inflate(R.layout.fragment_map, container, false);
     }
     catch (InflateException e) {
-      // map is already there, just return view as it is
+      
+    	// map is already there, just return view as it is
     }
 
     return view;
@@ -104,9 +105,9 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         // can get rid of the locations array and simply init the location from the Task object. The locations array is
         // locationCoordArray
         taskList = new ArrayList<Task>();
-        taskList.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj", "Take a pic of an aligator and send it to him", "3.2"));
-        taskList.add(new Task(Task.PRIORITY_LOW, "Visit John", "Pay a visit whenever possible", "1.3"));
-        LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
+        taskList.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj", "Take a pic of an aligator and send it to him", "3.2", 29.65133f, -82.342822f));
+        taskList.add(new Task(Task.PRIORITY_LOW, "Visit John", "Pay a visit whenever possible", "1.3", 29.650377f, -82.342857f));
+//        LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
 
         taskHash = new HashMap<Marker, MyMapTaskInfo>(); // will be used to
                                                          // retrieve task
@@ -144,15 +145,15 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, refreshInterval, 50, this);
 
         // add a marker for each task
-        int i = 0;
         for (Task item : taskList) {
-          // MARC YOU ALSO NEED TO MODIFY THIS CODE
-          // Here, we're actually adding the markers to the map
+	       // MARC YOU ALSO NEED TO MODIFY THIS CODE
+        	// Here, we're actually adding the markers to the map
           // As I said before, I'm using hardcoded locations (locationCoordArray) but you might want to pull the
           // location from your Task object (Task.java) if you've added location fields to it.
-          Marker myMarker = map.addMarker(new MarkerOptions().position(locationCoordArray[i]).title(item.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-          taskHash.put(myMarker, new MyMapTaskInfo(item.name, item.description, item.color_priority));
-          i++;
+        	LatLng cursorGPS = new LatLng(item.lattitude, item.longitude);
+        	
+        	Marker myMarker = map.addMarker(new MarkerOptions().position(cursorGPS).title(item.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+        	taskHash.put(myMarker, new MyMapTaskInfo(item.name, item.description, item.color_priority));
         }
 
         // add an InfoWindowAdapter that will handle the marker popups
@@ -238,11 +239,12 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
 
   @Override
   public void onInfoWindowClick(Marker marker) {
-    // MARC this is the final piece of code you need to write. This is actually what I spoke
+    
+	  // MARC this is the final piece of code you need to write. This is actually what I spoke
     // to you on the phone about. I haven't done it because, as of now, EditorActivity does
     // not have any hook to populate its fields.
     // What's happening here:
-    // We end up here when we click on a marker's popup window. What we want is to open up
+    // We end up here when we click on a marker's pop-up window. What we want is to open up
     // an edit activity for the task so the user can edit the task details. This can be done by
     // passing the task information to EditorActivity (once you've added hooks to EditorActivity to  
     // populate its fields).
