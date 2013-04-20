@@ -63,7 +63,7 @@ public class EditorActivity extends Activity {
 					priority = Task.PRIORITY_NORMAL;
 				}
 				
-				// TODO: This currently sets the miles left, latt, and long values to 0.0 (as the Map Activity is not working for me)
+				// TODO: This currently sets the miles left, lat, and long values to 0.0 (as the Map Activity is not working for me)
 				Task task = new Task(priority, name.getText().toString(), description.getText().toString(), "0.0", 0.0f, 0.0f);
 				
 				// Add the new Task to the SQL database
