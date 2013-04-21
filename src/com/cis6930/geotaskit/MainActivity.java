@@ -70,9 +70,21 @@ public class MainActivity extends SherlockFragmentActivity implements ActionBar.
 			case R.id.action_refresh:
 				f.onResume();
 				break;
-			case R.id.action_add:
-				startActivity(new Intent(this, EditorActivity.class));
+			case R.id.action_add:{
+				
+				f = new MyMapFragment();
+				
+				//FragmentTransaction is obtained in order to change the fragment in the container (R.id.content at activity_main.xml) with the requested fragment
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				
+				//make the change, setting the new fragment
+				ft.replace(R.id.main_content, f);
+				
+				//and commit changes to the FragmentTransaction object
+				ft.commit();
+				
 				break;
+			}
 			case R.id.action_settings:
 				//call the settings activity
 				startActivity(new Intent(this, SettingsActivity.class));

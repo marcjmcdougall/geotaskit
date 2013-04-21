@@ -131,6 +131,8 @@ public class DatabaseInterface {
 		newValue.put(OpenHelper.KEY_DESCRIPTION_SHORT, task.name);
 		newValue.put(OpenHelper.KEY_DESCRIPTION, task.description);
 		newValue.put(OpenHelper.KEY_DISTANCE, task.miles_left);
+		newValue.put(OpenHelper.KEY_LATTITUDE, task.lattitude);
+		newValue.put(OpenHelper.KEY_LONGITUDE, task.longitude);
 		
 		// Insert the item into the database
 		writeDatabase.insert(OpenHelper.DICTIONARY_TABLE_NAME, null, newValue);

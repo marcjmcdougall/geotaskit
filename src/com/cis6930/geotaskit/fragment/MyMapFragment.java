@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
@@ -25,9 +26,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.cis6930.geotaskit.EditorActivity;
 import com.cis6930.geotaskit.R;
 import com.cis6930.geotaskit.Task;
 import com.cis6930.geotaskit.backends.DatabaseInterface;
+import com.cis6930.geotaskit.backends.OpenHelper;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,6 +49,11 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   // create some dummy data for demo
 
   ArrayList<Task> taskList = null;
+
+  public static final int REQUEST_CODE = 0;
+  public static final String KEY_CONTEXT = "context";
+  public static final int CONTEXT_ADD = 0;
+  public static final int CONTEXT_EDIT = 1;
   
   private DatabaseInterface db;
 
@@ -58,7 +66,7 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
                                               // if you want actual
                                               // location-tracking, make this
                                               // class do something!
-  private HashMap<Marker, MyMapTaskInfo> taskHash; // will be used to retrieve
+  private HashMap<Marker, Task> taskHash; // will be used to retrieve
                                                    // task information when the
                                                    // popup is shown
   private LocationManager locationManager;
@@ -113,6 +121,14 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         // can get rid of the locations array and simply init the location from the Task object. The locations array is
         // locationCoordArray
         taskList = db.getTasks();
+        
+        System.out.println(taskList.size());
+        
+        for(Task task : taskList){
+        	
+        	System.out.println("[ " + task.lattitude + ", " + task.longitude + "]");
+        }
+        
         taskList.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj", "Take a pic of an aligator and send it to him", "3.2", 29.65133f, -82.342822f));
         taskList.add(new Task(Task.PRIORITY_LOW, "Visit John", "Pay a visit whenever possible", "1.3", 29.650377f, -82.342857f));
 //        LatLng[] locationCoordArray = { new LatLng(29.65133, -82.342822), new LatLng(29.650377, -82.342857) };
@@ -124,11 +140,17 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
 				
 				Toast.makeText(getActivity().getApplicationContext(), "CLICK DETECTED", Toast.LENGTH_SHORT).show();
 				
-				taskList.add(new Task(Task.PRIORITY_HIGH, "TEST MAP", "TEST", "" + 0.0f, (float) point.latitude, (float) point.longitude)); 
+				Intent markerIntent = new Intent(getActivity().getApplicationContext(), EditorActivity.class);
+				
+				markerIntent.putExtra(OpenHelper.KEY_LATTITUDE, point.latitude);
+				markerIntent.putExtra(OpenHelper.KEY_LONGITUDE, point.longitude);
+				markerIntent.putExtra(KEY_CONTEXT, CONTEXT_ADD);
+				
+				startActivity(markerIntent);
 			}
 		});
         
-        taskHash = new HashMap<Marker, MyMapTaskInfo>(); // will be used to
+        taskHash = new HashMap<Marker, Task>(); // Will be used to
                                                          // retrieve task
                                                          // information when the
                                                          // popup is shown
@@ -163,18 +185,6 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
         int refreshInterval = Integer.parseInt(sharedPrefs.getString(getString(R.string.pref_user_frequency_key), "1")) * 60 * 1000;
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, refreshInterval, 50, this);
 
-        // add a marker for each task
-        for (Task item : taskList) {
-	       // MARC YOU ALSO NEED TO MODIFY THIS CODE
-        	// Here, we're actually adding the markers to the map
-          // As I said before, I'm using hardcoded locations (locationCoordArray) but you might want to pull the
-          // location from your Task object (Task.java) if you've added location fields to it.
-        	LatLng cursorGPS = new LatLng(item.lattitude, item.longitude);
-        	
-        	Marker myMarker = map.addMarker(new MarkerOptions().position(cursorGPS).title(item.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-        	taskHash.put(myMarker, new MyMapTaskInfo(item.name, item.description, item.color_priority));
-        }
-
         // add an InfoWindowAdapter that will handle the marker popups
         map.setInfoWindowAdapter(new MyMapPopupHandler(this.inflater, this.taskHash));
         map.setOnInfoWindowClickListener(this); //register a listener that will respond to clicks on the marker's popup window
@@ -185,6 +195,20 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
       e.printStackTrace();
     }
   }
+
+private void initializeMarkerPositions() {
+	
+	for (Task item : taskList) {
+	   // MARC YOU ALSO NEED TO MODIFY THIS CODE
+		// Here, we're actually adding the markers to the map
+	  // As I said before, I'm using hardcoded locations (locationCoordArray) but you might want to pull the
+	  // location from your Task object (Task.java) if you've added location fields to it.
+		LatLng cursorGPS = new LatLng(item.lattitude, item.longitude);
+		
+		Marker myMarker = map.addMarker(new MarkerOptions().position(cursorGPS).title(item.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+		taskHash.put(myMarker, item);
+	}
+}
 
   // overrides of LocationSource
   @Override
@@ -205,7 +229,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
       map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), 17));
       if (locationCriteria.getAccuracy() == Criteria.ACCURACY_COARSE) {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-          Toast.makeText(getActivity(), R.string.getting_gps_infomsg, Toast.LENGTH_LONG).show();
+          
+        	Toast.makeText(getActivity(), R.string.getting_gps_infomsg, Toast.LENGTH_LONG).show();
           locationCriteria.setAccuracy(Criteria.ACCURACY_FINE);
           locationManager.requestLocationUpdates(locationManager.getBestProvider(locationCriteria, true), 20000, 50, this); // TODO:
                                                                                                                             // change
@@ -245,7 +270,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
 
   @Override
   public void onProviderDisabled(String provider) {
-    Toast.makeText(getActivity(), "No location providers found", Toast.LENGTH_SHORT).show();
+    
+	  Toast.makeText(getActivity(), "No location providers found", Toast.LENGTH_SHORT).show();
   }
 
   @Override
@@ -259,6 +285,16 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   @Override
   public void onInfoWindowClick(Marker marker) {
     
+	  Toast.makeText(getActivity().getApplicationContext(), "Info Window Clicked", Toast.LENGTH_SHORT).show();
+	  
+	  Task task = taskHash.get(marker);
+	  
+	  Intent intent = new Intent(getActivity().getApplicationContext() , EditorActivity.class);
+	  intent.putExtra(Task.TAG, task);
+	  intent.putExtra(KEY_CONTEXT, CONTEXT_EDIT);
+	  
+	  startActivityForResult(intent, REQUEST_CODE);
+	  
 	  // MARC this is the final piece of code you need to write. This is actually what I spoke
     // to you on the phone about. I haven't done it because, as of now, EditorActivity does
     // not have any hook to populate its fields.
@@ -271,5 +307,31 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
     // Task object with the tasks's title, description, priority etc.
     // Once you have the Task's info, you need to pass it to Armando's EditorActivity activity.
   }
-
+  
+  @Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	  
+	  	if(resultCode == Activity.RESULT_OK){
+	  		
+	  		if(requestCode == REQUEST_CODE){
+	  			
+//	  			db.editTask(task);
+	  		}
+	  	}
+	  
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+  
+  @Override
+	public void onResume() {
+		
+	  	System.out.println("**MapFragment onResume()**");
+	  
+	  	taskList = db.getTasks();
+	  	
+	  	// add a marker for each task
+	  	initializeMarkerPositions();
+	  	
+	  	super.onResume();
+	}
 }

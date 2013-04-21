@@ -1,6 +1,7 @@
 package com.cis6930.geotaskit;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +15,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.cis6930.geotaskit.backends.DatabaseInterface;
+import com.cis6930.geotaskit.backends.OpenHelper;
+import com.cis6930.geotaskit.fragment.MyMapFragment;
 
 public class EditorActivity extends Activity {
 
@@ -25,7 +28,7 @@ public class EditorActivity extends Activity {
 	EditText name;
 	EditText description;
 	
-	Button add_task_button;
+	Button add_task;
 	
 	private DatabaseInterface db;
 	
@@ -41,38 +44,11 @@ public class EditorActivity extends Activity {
 		// Get views
 		spinner = (Spinner) findViewById(R.id.editor_spinner_priority);
 		view_priority_indicator = findViewById(R.id.editor_view_priority_indicator);
-		add_task_button = (Button) findViewById(R.id.editor_button_add);
+		
+		add_task = (Button) findViewById(R.id.editor_button_add);
+		
 		name = (EditText) findViewById(R.id.editor_edit_name);
 		description = (EditText) findViewById(R.id.editor_edit_description);
-		
-		// Assign a click listener on the button
-		add_task_button.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				int priority = Task.PRIORITY_LOW;
-				
-				// Create the Task from the fields
-				if(spinner.getSelectedItem().toString().toLowerCase().equals("high")){
-					
-					priority = Task.PRIORITY_HIGH;
-				}
-				else if(spinner.getSelectedItem().toString().toLowerCase().equals("normal")){
-					
-					priority = Task.PRIORITY_NORMAL;
-				}
-				
-				// TODO: This currently sets the miles left, latt, and long values to 0.0 (as the Map Activity is not working for me)
-				Task task = new Task(priority, name.getText().toString(), description.getText().toString(), "0.0", 0.0f, 0.0f);
-				
-				// Add the new Task to the SQL database
-				db.addTask(task);
-				
-				// Close the editor window
-				finish();
-			}
-		});
 		
 		// Create adapter, set view for drop-down list, and assign to spinner
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.editor_priority_array, android.R.layout.simple_spinner_item);
@@ -88,6 +64,8 @@ public class EditorActivity extends Activity {
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {}
 		});
+		
+		initializeContextualViews();
 	}
 	
 	private void updatePriorityIndicator(){
@@ -118,11 +96,121 @@ public class EditorActivity extends Activity {
 	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		
 		if(item.getItemId() == R.id.action_discard){
+			
 			finish();
 			return true;
 		}
 		return false;
 	}
 
+	private void initializeContextualViews(){
+		
+		Intent intent = getIntent();
+		Bundle extras = intent.getExtras();
+		
+		System.out.println("**Entered initializeContextualViews()**");
+		
+		// If the context of the intent is to ADD a new task..
+		if(extras.getInt(MyMapFragment.KEY_CONTEXT) == MyMapFragment.CONTEXT_ADD){
+			
+			System.out.println("**CONTEXT_ADD**");
+			
+			// Assign a click listener on the choose_location button
+			add_task.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					
+					int priority = Task.PRIORITY_LOW;
+					
+					// Create the Task from the fields
+					if(spinner.getSelectedItem().toString().toLowerCase().equals("high")){
+						
+						priority = Task.PRIORITY_HIGH;
+					}
+					else if(spinner.getSelectedItem().toString().toLowerCase().equals("normal")){
+						
+						priority = Task.PRIORITY_NORMAL;
+					}
+					
+					Task task = new Task(priority, name.getText().toString(), description.getText().toString(), "0.0", (float) getIntent().getExtras().getDouble(OpenHelper.KEY_LATTITUDE), (float) getIntent().getExtras().getDouble(OpenHelper.KEY_LONGITUDE));
+					
+					// Add the new Task to the SQL database
+					db.addTask(task);
+					
+					// Close the editor window
+					finish();
+				}
+			});
+		}
+		else if(extras.getInt(MyMapFragment.KEY_CONTEXT) == MyMapFragment.CONTEXT_EDIT){
+			
+			final Task task = (Task) extras.getSerializable(Task.TAG);
+			
+			String name = task.name;
+			String desc = task.description;
+			int priority = task.color_priority;
+			
+			System.out.println("**CONTEXT_EDIT** " + priority + ", low: " + Task.PRIORITY_LOW + ", norm: " + Task.PRIORITY_NORMAL + ", high: " + Task.PRIORITY_HIGH);
+			
+			this.name.setText(name);
+			this.description.setText(desc);
+			
+			if(priority == Task.PRIORITY_LOW){
+				
+				spinner.setSelection(0);
+			}
+			else if(priority == Task.PRIORITY_NORMAL){
+				
+				spinner.setSelection(1);
+			}
+			else if(priority == Task.PRIORITY_HIGH){
+				
+				System.out.println("**Should be moving to selection 2**");
+				
+				spinner.setSelection(2);
+			}
+
+			
+			add_task.setText(getResources().getString(R.string.editor_button_confirm));
+			
+			add_task.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					
+					task.name = EditorActivity.this.name.getText().toString();
+					task.description = EditorActivity.this.description.getText().toString();
+					
+					Intent result = new Intent();
+					
+					int newPriority = Task.PRIORITY_LOW;
+					
+					// Create the Task from the fields
+					if(spinner.getSelectedItem().toString().toLowerCase().equals("high")){
+						
+						newPriority = Task.PRIORITY_HIGH;
+					}
+					else if(spinner.getSelectedItem().toString().toLowerCase().equals("normal")){
+						
+						newPriority = Task.PRIORITY_NORMAL;
+					}
+					
+					task.color_priority = newPriority;
+					
+					result.putExtra(Task.TAG, task);
+					
+					// Set the result for viewing later
+					setResult(RESULT_OK, result);
+					
+					// Close the editor
+					finish();
+				}
+			});
+		}
+	}
 }
+
+

@@ -41,8 +41,10 @@
     <string name="editor_notifications_label">Type of Notification</string>
     <string name="editor_radiobutton_notifications_normal">Normal (Bar)</string>
     <string name="editor_radiobutton_notifications_important">Important (Pop-up)</string>
-    <string name="editor_button_add">Add New Task</string>
+    <string name="editor_button_confirm">Confirm</string>
+    <string name="editor_button_choose">Choose Location</string>
     <string name="getting_gps_infomsg">Awaiting GPS fix...</string>
+    <string name="editor_button_add">Add Task</string>
     <string name="gps_disabled_infomsg">GPS is disabled. Location may not be accurate!</string>
 
     <string-array name="editor_priority_array">
