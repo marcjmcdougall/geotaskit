@@ -40,5 +40,9 @@ public class Task implements Serializable {
     
     this.id = System.currentTimeMillis();
   }
+  
+  public void setId(long id){
+	  this.id = id;
+  }
 
 }
