@@ -301,7 +301,8 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
   // overrides of OnMapClickListener
   @Override
   public void onMapClick(LatLng point) {
-    // used when the "Pick Location" button is clicked on in EditorActivity
+    
+	  // used when the "Pick Location" button is clicked on in EditorActivity
     // here, we basically pick a location for the task the user is now creating
     // once a location is selected, transition back to EditorActivity handing
     // back the coordinates
