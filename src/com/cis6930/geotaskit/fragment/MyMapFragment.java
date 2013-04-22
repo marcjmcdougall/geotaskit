@@ -305,11 +305,13 @@ public class MyMapFragment extends Fragment implements LocationSource, LocationL
     // here, we basically pick a location for the task the user is now creating
     // once a location is selected, transition back to EditorActivity handing
     // back the coordinates
-    PICK_LOCATION_FOR_NEW_TASK = false; // reset for future
-    PickLocationActivity pickLocationActivity = (PickLocationActivity) getActivity();
-    pickLocationActivity.latitude = point.latitude;
-    pickLocationActivity.longitude = point.longitude;
-    pickLocationActivity.end();
+    if (MyMapFragment.PICK_LOCATION_FOR_NEW_TASK) {
+      PICK_LOCATION_FOR_NEW_TASK = false; // reset for future
+      PickLocationActivity pickLocationActivity = (PickLocationActivity) getActivity();
+      pickLocationActivity.latitude = point.latitude;
+      pickLocationActivity.longitude = point.longitude;
+      pickLocationActivity.end();
+    }
   }
 
   // override of OnMapLongClickListener
