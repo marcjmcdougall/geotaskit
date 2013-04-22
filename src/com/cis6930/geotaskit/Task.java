@@ -19,6 +19,8 @@ public class Task implements Serializable {
   public String name;
   public String description;
 
+  private long id;
+  
   public float lattitude;
   public float longitude;
 
@@ -35,6 +37,8 @@ public class Task implements Serializable {
 
     this.lattitude = lattitude;
     this.longitude = longitude;
+    
+    this.id = System.currentTimeMillis();
   }
 
 }
