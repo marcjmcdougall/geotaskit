@@ -40,7 +40,7 @@ public class EditorActivity extends Activity implements OnClickListener {
 
   private final int REQUEST_CODE = 1;
   
-  private Double latitude, longitude;
+  private double latitude, longitude;
 
   public static boolean LOCATION_PICKED = false;
 
