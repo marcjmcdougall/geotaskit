@@ -99,7 +99,9 @@ public class ListFragment extends Fragment {
 
     System.out.println("**List Fragment onResume() called**");
 
-    items = db.getTasks();
+    items.clear();
+    items.addAll(db.getTasks());
+    
     adapter.notifyDataSetChanged();
 
     super.onResume();
