@@ -46,6 +46,10 @@
             android:label="@string/title_activity_editor" >
         </activity>
         <activity
+            android:name="com.cis6930.geotaskit.PickLocationActivity"
+            android:label="@string/title_pick_location_activity" >
+        </activity>
+        <activity
             android:excludeFromRecents="true"
             android:name="com.cis6930.geotaskit.PopupActivity"
             android:theme="@style/Theme.Sherlock.Dialog">
@@ -53,7 +57,7 @@
         
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
-                android:value="AIzaSyDgg1Lufyb48YuzvgYLrh1JAJTlYPLV01w" />
+                android:value="AIzaSyArwZD0lApVPGBHRS4yVk3L4DjroG8JgWA" />
     </application>
 
 </manifest>
