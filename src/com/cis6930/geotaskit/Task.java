@@ -14,7 +14,7 @@ public class Task implements Serializable {
   public String name;
   public String description;
   private long id;
-  public float lattitude;
+  public float latitude;
   public float longitude;
   // add the actual object that handles the coordinates!
   // for the time being... for demo purposes:
@@ -26,7 +26,7 @@ public class Task implements Serializable {
     this.name = name;
     this.description = description;
     this.miles_left = miles_left;
-    this.lattitude = lattitude;
+    this.latitude = lattitude;
     this.longitude = longitude;
     this.id = System.currentTimeMillis();
   }

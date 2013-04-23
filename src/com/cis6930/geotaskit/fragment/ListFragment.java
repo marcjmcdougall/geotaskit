@@ -32,7 +32,7 @@ public class ListFragment extends Fragment {
     System.out.println("Adapter Contents: ");
     System.out.println("Size: " + items.size());
     for (Task task : items) {
-      System.out.println("[ " + task.lattitude + ", " + task.longitude + " ]");
+      System.out.println("[ " + task.latitude + ", " + task.longitude + " ]");
     }
     adapter = new TaskAdapter(getActivity(), R.layout.item_task, items);
     ListView list = (ListView) view.findViewById(R.id.fragment_list_list);

@@ -148,8 +148,8 @@ public class MyMapFragment extends SupportMapFragment implements LocationSource,
     taskList = db.getTasks();
     taskHash = new HashMap<Marker, Task>();
     for (Task item : taskList) {
-      System.out.println("[ " + item.lattitude + ", " + item.longitude + "]");
-      LatLng cursorGPS = new LatLng(item.lattitude, item.longitude);
+      System.out.println("[ " + item.latitude + ", " + item.longitude + "]");
+      LatLng cursorGPS = new LatLng(item.latitude, item.longitude);
       Marker myMarker = map.addMarker(new MarkerOptions().position(cursorGPS).title(item.name)
           .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
       taskHash.put(myMarker, item);

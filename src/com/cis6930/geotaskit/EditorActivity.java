@@ -202,7 +202,7 @@ public class EditorActivity extends Activity implements OnClickListener {
       int priority = task_to_edit.color_priority;
       System.out.println("**CONTEXT_EDIT** " + priority + ", low: " + Task.PRIORITY_LOW
           + ", norm: " + Task.PRIORITY_NORMAL + ", high: " + Task.PRIORITY_HIGH);
-      latTextView.setText(String.valueOf(task_to_edit.lattitude));
+      latTextView.setText(String.valueOf(task_to_edit.latitude));
       longTextView.setText(String.valueOf(task_to_edit.longitude));
       latTextView.setVisibility(View.VISIBLE);
       longTextView.setVisibility(View.VISIBLE);
@@ -231,8 +231,9 @@ public class EditorActivity extends Activity implements OnClickListener {
           removeTask(task_to_edit);
           task_to_edit.name = EditorActivity.this.name.getText().toString();
           task_to_edit.description = EditorActivity.this.description.getText().toString();
-          task_to_edit.lattitude = (float) latitude;
+          task_to_edit.latitude = (float) latitude;
           task_to_edit.longitude = (float) longitude;
+          System.out.println(latitude+" "+longitude);
           Intent result = new Intent();
           int newPriority = Task.PRIORITY_LOW;
           // Create the Task from the fields
