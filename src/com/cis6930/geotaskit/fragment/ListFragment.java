@@ -2,6 +2,7 @@ package com.cis6930.geotaskit.fragment;
 
 import java.util.ArrayList;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
+import com.cis6930.geotaskit.EditorActivity;
 import com.cis6930.geotaskit.R;
 import com.cis6930.geotaskit.Task;
 import com.cis6930.geotaskit.adapter.TaskAdapter;
@@ -44,6 +46,28 @@ public class ListFragment extends Fragment {
     ListView list = (ListView) view.findViewById(R.id.fragment_list_list);
     list.setAdapter(adapter);
 
+    // When single tap, task will be edited with EditorActivity and extras
+    list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, int index, long arg3) {
+			// Get task to be edited
+			Task task = items.get(index);
+			
+			// Pass data of the task as extras
+			Intent intent = new Intent(getActivity(), EditorActivity.class);
+			intent.putExtra(EditorActivity.INTENT_EDITING, true);
+			intent.putExtra(EditorActivity.INTENT_TASK_ID, task.getId());
+			intent.putExtra(EditorActivity.INTENT_TASK_PRIORITY, task.color_priority);
+			intent.putExtra(EditorActivity.INTENT_TASK_NAME, task.name);
+			intent.putExtra(EditorActivity.INTENT_TASK_DESCRIPTION, task.description);
+			intent.putExtra(EditorActivity.INTENT_TASK_LATITUDE, task.lattitude);
+			intent.putExtra(EditorActivity.INTENT_TASK_LONGITUD, task.longitude);
+			
+			// Start activity
+			startActivity(intent);
+		}
+	});
+    
     list.setOnItemLongClickListener(new OnItemLongClickListener() {
 
       @Override

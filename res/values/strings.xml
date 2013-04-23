@@ -15,6 +15,7 @@
     <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="action_discard">Discard</string>
+    <string name="action_delete">Delete</string>
 
     <string-array name="actionbar_navigation_list">
         <item>List</item>
@@ -46,6 +47,7 @@
     <string name="editor_button_choose">Choose Location</string>
     <string name="getting_gps_infomsg">Awaiting GPS fix...</string>
     <string name="editor_button_add">Add Task</string>
+    <string name="editor_button_add_when_editing">Edit Task</string>
     <string name="gps_disabled_infomsg">GPS is disabled. Location may not be accurate!</string>
 
     <string-array name="editor_priority_array">

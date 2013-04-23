@@ -22,6 +22,17 @@ import com.cis6930.geotaskit.fragment.MyMapFragment;
 
 public class EditorActivity extends Activity implements OnClickListener {
 
+	//public static keys for intent extras
+	public static final String INTENT_EDITING = "editor_extra_key_isEditing";	//for boolean value to check if it is in editing mode
+	public static final String INTENT_TASK_ID = "editor_extra_key_task_id";
+	public static final String INTENT_TASK_PRIORITY = "editor_extra_key_task_priority";
+	public static final String INTENT_TASK_NAME = "editor_extra_key_task_name";
+	public static final String INTENT_TASK_DESCRIPTION = "editor_extra_key_task_desc";
+	public static final String INTENT_TASK_LATITUDE = "editor_extra_key_task_lat";
+	public static final String INTENT_TASK_LONGITUD = "editor_extra_key_task_lon";
+	
+	private boolean isEditing = false;
+	
 	// Small bar that indicates the priority selected on top of the priority
 	// spinner
 	View view_priority_indicator;
@@ -44,6 +55,8 @@ public class EditorActivity extends Activity implements OnClickListener {
 	public static boolean LOCATION_PICKED = false;
 
 	private DatabaseInterface db;
+	
+	private Task task_to_edit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +100,59 @@ public class EditorActivity extends Activity implements OnClickListener {
 			}
 		});
 
+		
+		// If this activity is Editing a task, then get data, and set to views
+		if( isEditing = getIntent().getBooleanExtra(INTENT_EDITING, false) ){
+			
+			// Update button text for editing
+			add_task.setText(getText(R.string.editor_button_add_when_editing));
+			
+			// Get intent, and retrieve extras
+			Intent intent_extras = getIntent();
+			
+			long id = intent_extras.getIntExtra(INTENT_TASK_ID, 0);
+			int priority = intent_extras.getIntExtra(INTENT_TASK_PRIORITY, Task.PRIORITY_NORMAL);
+			String name = intent_extras.getStringExtra(INTENT_TASK_NAME);
+			String desc = intent_extras.getStringExtra(INTENT_TASK_DESCRIPTION);
+			latitude = intent_extras.getFloatExtra(INTENT_TASK_LATITUDE, 0.0f);
+			longitude = intent_extras.getFloatExtra(INTENT_TASK_LONGITUD, 0.0f);
+			
+			System.out.println(":Prio:"+intent_extras.getIntExtra(INTENT_TASK_PRIORITY, Task.PRIORITY_NORMAL)+"-"+priority);
+			
+			LOCATION_PICKED = true;
+			
+			// Build Task object to delete via DatabaseInterface
+			task_to_edit = new Task(priority, name, desc, "", (float) latitude, (float) longitude);
+			task_to_edit.setId(id);
+			
+			// Set values for views accordingly
+			
+			// Priority is set as low by default, check for normal and high
+			if(priority == Task.PRIORITY_NORMAL)
+				spinner.setSelection(1);
+			else if(priority == Task.PRIORITY_HIGH)
+				spinner.setSelection(2);
+			
+			updatePriorityIndicator();
+			
+			this.name.setText(name);
+			this.description.setText(desc);
+			
+			setCoordinatesLabel();
+		}
+		
 		initializeContextualViews();
+	}
+	
+	private void setCoordinatesLabel(){
+		String lat = String.format("%9.6f",latitude);
+		String longi = String.format("%9.6f",longitude);
+		latTextView.setText(lat);
+		longTextView.setText(longi);
+		latTextView.setVisibility(View.VISIBLE);
+		longTextView.setVisibility(View.VISIBLE);
+		latLabelTextView.setVisibility(View.VISIBLE);
+		longLabelTextView.setVisibility(View.VISIBLE);
 	}
 
 	private void updatePriorityIndicator() {
@@ -108,6 +173,10 @@ public class EditorActivity extends Activity implements OnClickListener {
 
 		view_priority_indicator.startAnimation(anim_alpha);
 	}
+	
+	private void removeTask(Task task){
+		db.removeTask(task);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,8 +187,16 @@ public class EditorActivity extends Activity implements OnClickListener {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-
+		
+		//IF clauses for whenever an option in the action bar is selected
 		if (item.getItemId() == R.id.action_discard) {
+			//discarding... just finish activity
+			finish();
+			return true;
+		}else if(item.getItemId() == R.id.action_delete){
+			//delete task if editing, finish activity
+			if(isEditing)
+				removeTask(task_to_edit);
 			finish();
 			return true;
 		}
@@ -151,7 +228,8 @@ public class EditorActivity extends Activity implements OnClickListener {
 			else{
 				// if the user has already selected a location (e.g. if we arrived here by long clicking
 				// on the map
-				initTextFields(getIntent());
+				if(!isEditing)
+					initTextFields(getIntent());
 			}
 
 			// handle click on pick location button (allow user to choose a new
@@ -179,10 +257,14 @@ public class EditorActivity extends Activity implements OnClickListener {
 //										OpenHelper.KEY_LATTITUDE), (float) getIntent().getExtras().getDouble(
 //												OpenHelper.KEY_LONGITUDE));
 						
-						Task task = new Task(priority, name.getText().toString(), description.getText().toString(), "0.0", (float) latitude, (float) longitude);
+						Task task = new Task(priority, name.getText().toString(), description.getText().toString(), "", (float) latitude, (float) longitude);
 
 //						DEBUG
 						System.out.println("**LATITUDE: " + latitude + ", " + "LONGITUDE: " + longitude);
+						
+						// If this activity is editing a task, then remove current and add new with current data 
+						if(isEditing)
+							removeTask(task_to_edit);
 						
 						// Add the new Task to the SQL database
 						db.addTask(task);
@@ -289,14 +371,7 @@ public class EditorActivity extends Activity implements OnClickListener {
 		LOCATION_PICKED = true;
 		latitude = intent.getDoubleExtra(OpenHelper.KEY_LATTITUDE, 0.0);
 		longitude = intent.getDoubleExtra(OpenHelper.KEY_LONGITUDE, 0.0);
-		String lat = String.format("%9.6f",latitude);
-		String longi = String.format("%9.6f",longitude);
-		latTextView.setText(lat);
-		longTextView.setText(longi);
-		latTextView.setVisibility(View.VISIBLE);
-		longTextView.setVisibility(View.VISIBLE);
-		latLabelTextView.setVisibility(View.VISIBLE);
-		longLabelTextView.setVisibility(View.VISIBLE);
+		setCoordinatesLabel();
 	}
 
 	@Override
