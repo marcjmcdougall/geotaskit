@@ -182,6 +182,7 @@ public class EditorActivity extends Activity implements OnClickListener {
             // System.out.println("**LATITUDE: " + latitude + ", " + "LONGITUDE: " + longitude);
             // Add the new Task to the SQL database
             db.addTask(task);
+            LOCATION_PICKED = false;
             // Close the editor window
             finish();
           }
@@ -231,9 +232,12 @@ public class EditorActivity extends Activity implements OnClickListener {
           removeTask(task_to_edit);
           task_to_edit.name = EditorActivity.this.name.getText().toString();
           task_to_edit.description = EditorActivity.this.description.getText().toString();
-          task_to_edit.latitude = (float) latitude;
-          task_to_edit.longitude = (float) longitude;
-          System.out.println(latitude+" "+longitude);
+          if (LOCATION_PICKED) {
+            task_to_edit.latitude = (float) latitude;
+            task_to_edit.longitude = (float) longitude;
+            LOCATION_PICKED = false;
+          }
+          System.out.println(latitude + " " + longitude);
           Intent result = new Intent();
           int newPriority = Task.PRIORITY_LOW;
           // Create the Task from the fields
@@ -275,7 +279,6 @@ public class EditorActivity extends Activity implements OnClickListener {
     setCoordinatesLabel();
   }
 
-  
   // handle clicks on the 'Pick Location' button. Here, we transition to
   // PickLocationActivity to allow the user to pick a new location on the map.
   @Override
