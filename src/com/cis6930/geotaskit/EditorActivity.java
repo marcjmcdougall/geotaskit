@@ -232,6 +232,8 @@ public class EditorActivity extends Activity implements OnClickListener {
           removeTask(task_to_edit);
           task_to_edit.name = EditorActivity.this.name.getText().toString();
           task_to_edit.description = EditorActivity.this.description.getText().toString();
+          // if the user doesn't change the location by clicking on 'pick location'
+          // preserve the previous values
           if (LOCATION_PICKED) {
             task_to_edit.latitude = (float) latitude;
             task_to_edit.longitude = (float) longitude;
