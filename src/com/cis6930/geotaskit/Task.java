@@ -30,4 +30,12 @@ public class Task implements Serializable {
     this.longitude = longitude;
     this.id = System.currentTimeMillis();
   }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public long getId() {
+    return this.id;
+  }
 }

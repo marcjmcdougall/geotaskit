@@ -44,9 +44,6 @@ public class MyMapFragment extends SupportMapFragment implements LocationSource,
     OnInfoWindowClickListener, OnMapClickListener, OnMapLongClickListener {
   ArrayList<Task> taskList = null;
   public static final int REQUEST_CODE = 0;
-  public static final String KEY_CONTEXT = "context";
-  public static final int CONTEXT_ADD = 0;
-  public static final int CONTEXT_EDIT = 1;
   public static boolean PICK_LOCATION_FOR_NEW_TASK = false;
   // PICK_LOCATION_FOR_NEW_TASK
   // set to true inside PickLocationActivity.
@@ -84,7 +81,8 @@ public class MyMapFragment extends SupportMapFragment implements LocationSource,
     System.out.println("**MapFragment onDestroyView()**");
     super.onDestroyView();
     try {
-      SupportMapFragment mapFragment = (SupportMapFragment)(getFragmentManager().findFragmentById(R.id.map));  
+      SupportMapFragment mapFragment = (SupportMapFragment) (getFragmentManager()
+          .findFragmentById(R.id.map));
       getFragmentManager().beginTransaction().remove(mapFragment).commit();
     }
     catch (Exception e) {
@@ -219,7 +217,7 @@ public class MyMapFragment extends SupportMapFragment implements LocationSource,
     Task task = taskHash.get(marker);
     Intent intent = new Intent(getActivity().getApplicationContext(), EditorActivity.class);
     intent.putExtra(Task.TAG, task);
-    intent.putExtra(KEY_CONTEXT, CONTEXT_EDIT);
+    intent.putExtra(EditorActivity.KEY_CONTEXT, EditorActivity.CONTEXT_EDIT);
     startActivityForResult(intent, REQUEST_CODE);
   }
 
@@ -274,7 +272,7 @@ public class MyMapFragment extends SupportMapFragment implements LocationSource,
       Intent markerIntent = new Intent(getActivity().getApplicationContext(), EditorActivity.class);
       markerIntent.putExtra(OpenHelper.KEY_LATTITUDE, point.latitude);
       markerIntent.putExtra(OpenHelper.KEY_LONGITUDE, point.longitude);
-      markerIntent.putExtra(KEY_CONTEXT, CONTEXT_ADD);
+      markerIntent.putExtra(EditorActivity.KEY_CONTEXT, EditorActivity.CONTEXT_ADD);
       startActivity(markerIntent);
     }
   }

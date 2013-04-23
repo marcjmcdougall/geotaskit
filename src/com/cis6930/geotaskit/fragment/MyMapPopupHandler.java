@@ -50,7 +50,7 @@ public class MyMapPopupHandler implements InfoWindowAdapter {
       View balloon_priority = view.findViewById(R.id.balloon_task_priority);
       balloon_priority.setBackgroundColor(thisTask.color_priority);
     }
-    else{
+    else {
       System.out.println("MyMapPopupHandler: Task was empty!");
     }
     return view;

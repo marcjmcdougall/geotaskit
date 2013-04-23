@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.cis6930.geotaskit.backends.DatabaseInterface;
 import com.cis6930.geotaskit.backends.OpenHelper;
-import com.cis6930.geotaskit.fragment.MyMapFragment;
 
 public class EditorActivity extends Activity implements OnClickListener {
   // Small bar that indicates the priority selected on top of the priority
@@ -35,7 +34,12 @@ public class EditorActivity extends Activity implements OnClickListener {
   private final int REQUEST_CODE = 1;
   private double latitude, longitude;
   public static boolean LOCATION_PICKED = false;
+  public static int CONTEXT_EDIT = 0;
+  public static int CONTEXT_ADD = 1;
+  public static final String KEY_CONTEXT = "context";
   private DatabaseInterface db;
+  private Task task_to_edit;
+  private boolean isEditing = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,17 @@ public class EditorActivity extends Activity implements OnClickListener {
     initializeContextualViews();
   }
 
+  private void setCoordinatesLabel() {
+    String lat = String.format("%9.6f", latitude);
+    String longi = String.format("%9.6f", longitude);
+    latTextView.setText(lat);
+    longTextView.setText(longi);
+    latTextView.setVisibility(View.VISIBLE);
+    longTextView.setVisibility(View.VISIBLE);
+    latLabelTextView.setVisibility(View.VISIBLE);
+    longLabelTextView.setVisibility(View.VISIBLE);
+  }
+
   private void updatePriorityIndicator() {
     // Set the color of the indicator based on the chosen option in the spinner
     if (spinner.getSelectedItem().toString().toLowerCase().equals("high"))
@@ -89,16 +104,32 @@ public class EditorActivity extends Activity implements OnClickListener {
     view_priority_indicator.startAnimation(anim_alpha);
   }
 
+  private void removeTask(Task task) {
+    db.removeTask(task);
+  }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.editor, menu);
+    // hide the delete button on the actionbar if we're adding a new task
+    if (!isEditing) {
+      menu.findItem(R.id.action_delete).setVisible(false);
+    }
     return true;
   }
 
   @Override
   public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    // IF clauses for whenever an option in the action bar is selected
     if (item.getItemId() == R.id.action_discard) {
+      // discarding... just finish activity
+      finish();
+      return true;
+    }
+    else if (item.getItemId() == R.id.action_delete) {
+      // delete task if editing, finish activity
+      removeTask(task_to_edit);
       finish();
       return true;
     }
@@ -109,23 +140,22 @@ public class EditorActivity extends Activity implements OnClickListener {
     Intent intent = getIntent();
     Bundle extras = intent.getExtras();
     System.out.println("**Entered initializeContextualViews()**");
-    if (extras.getInt(MyMapFragment.KEY_CONTEXT) == MyMapFragment.CONTEXT_ADD) {
-      // add a new task. We get here if the user clicks on
-      // a. the '+' button in the actionbar OR
-      // b. anything other than a marker on the map
+
+    // add a new task. We get here if the user clicks on
+    // a. the '+' button in the actionbar OR
+    // b. anything other than a marker on the map
+    if (extras.getInt(KEY_CONTEXT) == CONTEXT_ADD) {
       System.out.println("**CONTEXT_ADD**");
       Button pick_location = (Button) findViewById(R.id.editor_button_pick_location);
       if (!LOCATION_PICKED) {
-        // if the user hasn't chosen a location so far, hide the lat and long
-        // text fields
+        // if the user hasn't chosen a location so far, hide the lat and long text fields
         latTextView.setVisibility(View.GONE);
         longTextView.setVisibility(View.GONE);
         longLabelTextView.setVisibility(View.GONE);
         latLabelTextView.setVisibility(View.GONE);
       }
       else {
-        // if the user has already selected a location (e.g. if we arrived here
-        // by long clicking
+        // if the user has already selected a location (e.g. if we arrived here by long clicking
         // on the map
         initTextFields(getIntent());
       }
@@ -146,16 +176,10 @@ public class EditorActivity extends Activity implements OnClickListener {
             else if (spinner.getSelectedItem().toString().toLowerCase().equals("normal")) {
               priority = Task.PRIORITY_NORMAL;
             }
-            // Task task = new Task(priority, name.getText().toString(),
-            // description.getText()
-            // .toString(), "0.0",(float) getIntent().getExtras().getDouble(
-            // OpenHelper.KEY_LATTITUDE), (float)
-            // getIntent().getExtras().getDouble(
-            // OpenHelper.KEY_LONGITUDE));
             Task task = new Task(priority, name.getText().toString(), description.getText()
-                .toString(), "0.0", (float) latitude, (float) longitude);
+                .toString(), "", (float) latitude, (float) longitude);
             // DEBUG
-            System.out.println("**LATITUDE: " + latitude + ", " + "LONGITUDE: " + longitude);
+            // System.out.println("**LATITUDE: " + latitude + ", " + "LONGITUDE: " + longitude);
             // Add the new Task to the SQL database
             db.addTask(task);
             // Close the editor window
@@ -168,17 +192,18 @@ public class EditorActivity extends Activity implements OnClickListener {
         }
       });
     }
-    else if (extras.getInt(MyMapFragment.KEY_CONTEXT) == MyMapFragment.CONTEXT_EDIT) {
-      // edit existing task. We get here if the user clicks ON a marker on the
-      // map
-      final Task task = (Task) extras.getSerializable(Task.TAG);
-      String name = task.name;
-      String desc = task.description;
-      int priority = task.color_priority;
+    // edit existing task. We get here if the user clicks ON a marker on the
+    // map
+    else if (extras.getInt(KEY_CONTEXT) == CONTEXT_EDIT) {
+      isEditing = true;
+      task_to_edit = (Task) extras.getSerializable(Task.TAG);
+      String name = task_to_edit.name;
+      String desc = task_to_edit.description;
+      int priority = task_to_edit.color_priority;
       System.out.println("**CONTEXT_EDIT** " + priority + ", low: " + Task.PRIORITY_LOW
           + ", norm: " + Task.PRIORITY_NORMAL + ", high: " + Task.PRIORITY_HIGH);
-      latTextView.setText(String.valueOf(task.lattitude));
-      longTextView.setText(String.valueOf(task.longitude));
+      latTextView.setText(String.valueOf(task_to_edit.lattitude));
+      longTextView.setText(String.valueOf(task_to_edit.longitude));
       latTextView.setVisibility(View.VISIBLE);
       longTextView.setVisibility(View.VISIBLE);
       latLabelTextView.setVisibility(View.VISIBLE);
@@ -202,8 +227,10 @@ public class EditorActivity extends Activity implements OnClickListener {
       add_task.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-          task.name = EditorActivity.this.name.getText().toString();
-          task.description = EditorActivity.this.description.getText().toString();
+          // If this activity is editing a task, then remove current and add new with current data
+          removeTask(task_to_edit);
+          task_to_edit.name = EditorActivity.this.name.getText().toString();
+          task_to_edit.description = EditorActivity.this.description.getText().toString();
           Intent result = new Intent();
           int newPriority = Task.PRIORITY_LOW;
           // Create the Task from the fields
@@ -213,10 +240,12 @@ public class EditorActivity extends Activity implements OnClickListener {
           else if (spinner.getSelectedItem().toString().toLowerCase().equals("normal")) {
             newPriority = Task.PRIORITY_NORMAL;
           }
-          task.color_priority = newPriority;
-          result.putExtra(Task.TAG, task);
+          task_to_edit.color_priority = newPriority;
+          result.putExtra(Task.TAG, task_to_edit);
           // Set the result for viewing later
           setResult(RESULT_OK, result);
+          // Add the new Task to the SQL database
+          db.addTask(task_to_edit);
           // Close the editor
           finish();
         }
@@ -240,14 +269,7 @@ public class EditorActivity extends Activity implements OnClickListener {
     LOCATION_PICKED = true;
     latitude = intent.getDoubleExtra(OpenHelper.KEY_LATTITUDE, 0.0);
     longitude = intent.getDoubleExtra(OpenHelper.KEY_LONGITUDE, 0.0);
-    String lat = String.format("%9.6f", latitude);
-    String longi = String.format("%9.6f", longitude);
-    latTextView.setText(lat);
-    longTextView.setText(longi);
-    latTextView.setVisibility(View.VISIBLE);
-    longTextView.setVisibility(View.VISIBLE);
-    latLabelTextView.setVisibility(View.VISIBLE);
-    longLabelTextView.setVisibility(View.VISIBLE);
+    setCoordinatesLabel();
   }
 
   @Override

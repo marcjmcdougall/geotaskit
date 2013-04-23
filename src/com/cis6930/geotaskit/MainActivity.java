@@ -67,7 +67,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     case R.id.action_add: {
       Intent intent = new Intent(getApplicationContext(), EditorActivity.class);
       EditorActivity.LOCATION_PICKED = false;
-      intent.putExtra(MyMapFragment.KEY_CONTEXT, MyMapFragment.CONTEXT_ADD);
+      intent.putExtra(EditorActivity.KEY_CONTEXT, EditorActivity.CONTEXT_ADD);
       startActivity(intent);
       /*
        * f = new MyMapFragment();

@@ -20,14 +20,14 @@ public class PickLocationActivity extends SherlockFragmentActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_picklocation);
+    setContentView(R.layout.activity_main);
     f = new MyMapFragment();
     MyMapFragment.PICK_LOCATION_FOR_NEW_TASK = true;
     // FragmentTransaction is obtained in order to change the fragment in the
     // container (R.id.content at activity_main.xml) with the requested fragment
     ft = getSupportFragmentManager().beginTransaction();
     // make the change, setting the new fragment
-    ft.replace(R.id.main_content_picklocation, f);
+    ft.replace(R.id.main_content, f);
     // and commit changes to the FragmentTransaction object
     ft.commit();
   }
@@ -40,6 +40,11 @@ public class PickLocationActivity extends SherlockFragmentActivity {
     intent.putExtra(OpenHelper.KEY_LATTITUDE, latitude);
     intent.putExtra(OpenHelper.KEY_LONGITUDE, longitude);
     setResult(RESULT_OK, intent);
+    ft = getSupportFragmentManager().beginTransaction();
+    // make the change, setting the new fragment
+    ft.remove(f);
+    // and commit changes to the FragmentTransaction object
+    ft.commit();
     finish();
   }
 }
