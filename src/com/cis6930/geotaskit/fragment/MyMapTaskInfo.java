@@ -3,7 +3,6 @@ package com.cis6930.geotaskit.fragment;
 /*
  * Models the information pertaining to the task so that it can be displayed on the map 
  */
-
 public class MyMapTaskInfo {
   private String taskTitle;
   private int taskPriority;
