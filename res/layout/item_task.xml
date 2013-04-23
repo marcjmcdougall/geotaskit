@@ -45,7 +45,6 @@
         android:id="@+id/item_task_text_miles"
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
-       	android:text="3.4 mi"
        	android:singleLine="true"
        	android:gravity="center"
        	android:textSize="@dimen/item_task_text_miles_font_size"/>

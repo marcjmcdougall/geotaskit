@@ -45,7 +45,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
     View view = convertView;
     // just draw the view ONlY if it is not recycled (which means the view is
     // null)
-    // when the iteam was already drawn the adapter recycles its inflated layout
+    // when the item was already drawn the adapter recycles its inflated layout
     // for a better memory management and just needs to re-set the view children
     // contents
     if (view == null) {
@@ -60,12 +60,14 @@ public class TaskAdapter extends ArrayAdapter<Task> {
       View view_priority = view.findViewById(R.id.item_task_view_priority);
       TextView text_name = (TextView) view.findViewById(R.id.item_task_text_name);
       TextView text_description = (TextView) view.findViewById(R.id.item_task_text_description);
-      TextView text_miles = (TextView) view.findViewById(R.id.item_task_text_miles);
+      // Commenting out the 'mi' on the List view until we actually have code that updates the distance
+      // in real-time
+      //TextView text_miles = (TextView) view.findViewById(R.id.item_task_text_miles);
       // set priority color and data
       view_priority.setBackgroundColor(task.color_priority);
       text_name.setText(task.name);
       text_description.setText(task.description);
-      text_miles.setText(task.miles_left + " mi");
+      //text_miles.setText(task.miles_left + " mi");
     }
     return view;
   }
