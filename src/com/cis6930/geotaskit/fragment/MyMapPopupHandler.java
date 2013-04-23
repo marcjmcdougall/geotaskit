@@ -12,7 +12,6 @@ import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
 public class MyMapPopupHandler implements InfoWindowAdapter {
-
   private View view;
   private HashMap<Marker, Task> taskHash;
 
@@ -44,5 +43,4 @@ public class MyMapPopupHandler implements InfoWindowAdapter {
     balloon_priority.setBackgroundColor(thisTask.color_priority);
     return view;
   }
-
 }

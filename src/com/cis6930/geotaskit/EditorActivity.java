@@ -379,5 +379,4 @@ public class EditorActivity extends Activity implements OnClickListener {
 		startActivityForResult(new Intent(EditorActivity.this, PickLocationActivity.class),
 				REQUEST_CODE);
 	}
-
 }

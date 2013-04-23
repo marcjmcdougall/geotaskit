@@ -3,7 +3,6 @@ package com.cis6930.geotaskit.fragment;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,30 +21,22 @@ import com.cis6930.geotaskit.adapter.TaskAdapter;
 import com.cis6930.geotaskit.backends.DatabaseInterface;
 
 public class ListFragment extends Fragment {
-
   private ArrayList<Task> items;
-
   private DatabaseInterface db;
   private TaskAdapter adapter;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
     // TODO: Not adding new components to ListView for some reason (they are in
     // DB)
     View view = inflater.inflate(R.layout.fragment_list, container, false);
     System.out.println("**List Fragment onCreateView() called**");
-
     System.out.println("Adapter Contents: ");
     System.out.println("Size: " + items.size());
-
     for (Task task : items) {
-
       System.out.println("[ " + task.lattitude + ", " + task.longitude + " ]");
     }
-
     adapter = new TaskAdapter(getActivity(), R.layout.item_task, items);
-
     ListView list = (ListView) view.findViewById(R.id.fragment_list_list);
     list.setAdapter(adapter);
 
@@ -58,7 +49,6 @@ public class ListFragment extends Fragment {
 	});
     
     list.setOnItemLongClickListener(new OnItemLongClickListener() {
-
     	@Override
     	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long arg3) {
     		
@@ -95,7 +85,6 @@ public class ListFragment extends Fragment {
     		return true;
     	}
     });
-
     return view;
   }
   
@@ -126,13 +115,10 @@ public class ListFragment extends Fragment {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-
     items = new ArrayList<Task>();
     db = new DatabaseInterface(getActivity().getApplicationContext());
-
     items = db.getTasks();
     // adapter.notifyDataSetChanged();
-
     // items.add(new Task(Task.PRIORITY_HIGH, "Take pic for Neeraj",
     // "Take a pic of an aligator and send it to him", "3.2", 58.2942f,
     // 54.405f));
@@ -153,20 +139,15 @@ public class ListFragment extends Fragment {
     // "Pay a visit whenever possible", "1.3", 58.2942f, 54.405f));
     // items.add(new Task(Task.PRIORITY_NORMAL, "Groceries",
     // "Buy them at Publix first week every mo.", "4.7", 58.2942f, 54.405f));
-
     super.onCreate(savedInstanceState);
   }
 
   @Override
   public void onResume() {
-
     System.out.println("**List Fragment onResume() called**");
-
     items.clear();
     items.addAll(db.getTasks());
-    
     adapter.notifyDataSetChanged();
-
     super.onResume();
   }
 }
