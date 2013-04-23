@@ -4,6 +4,33 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
+    
+    <!-- Layout of message and icon to show when list is empty -->
+    <LinearLayout
+        android:id="@+id/fragment_list_guide"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:visibility="gone">
+	    
+	    <TextView
+	        android:layout_width="0dp"
+	        android:layout_weight="0.65"
+	        android:layout_height="wrap_content"
+	        android:text="@string/guide_init_message"
+	        android:padding="10dp"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:gravity="center"/>
+	    
+	    <ImageView
+	        android:layout_width="0dp"
+	        android:layout_weight="0.35"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/guide_init_arrow"
+	        android:paddingTop="10dp"/>
+		
+	</LinearLayout>
+	
 	<ListView
 	    android:id="@+id/fragment_list_list"
 	    android:layout_height="match_parent"

@@ -3,6 +3,7 @@ package com.cis6930.geotaskit.fragment;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cis6930.geotaskit.EditorActivity;
@@ -24,6 +26,7 @@ public class ListFragment extends Fragment {
   private ArrayList<Task> items;
   private DatabaseInterface db;
   private TaskAdapter adapter;
+  private LinearLayout layout_guide;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,6 +84,9 @@ public class ListFragment extends Fragment {
         return true;
       }
     });
+    
+    layout_guide = (LinearLayout) view.findViewById(R.id.fragment_list_guide);
+    
     return view;
   }
 
@@ -115,7 +121,19 @@ public class ListFragment extends Fragment {
     System.out.println("**List Fragment onResume() called**");
     items.clear();
     items.addAll(db.getTasks());
+    
+    // Show guiding layout when list is empty
+    if(items.isEmpty()){
+    	layout_guide.setVisibility(View.VISIBLE);
+    }
+    
     adapter.notifyDataSetChanged();
     super.onResume();
   }
+  
+  @Override
+	public void onPause() {
+	  	layout_guide.setVisibility(View.GONE);
+		super.onPause();
+	}
 }

@@ -58,9 +58,11 @@
     
     <!-- Dialog -->
 
-  <string name="list_dialog_task_message">What do you wish to do with this task?</string>
-  <string name="list_dialog_task_edit">Edit</string>
-  <string name="list_dialog_task_delete">Delete</string>
-  <string name="list_dialog_task_cancel">Cancel</string>
+	<string name="list_dialog_task_message">What do you wish to do with this task?</string>
+	<string name="list_dialog_task_edit">Edit</string>
+	<string name="list_dialog_task_delete">Delete</string>
+	<string name="list_dialog_task_cancel">Cancel</string>
+	
+	<string name="guide_init_message">There are no tasks created! Let\'s fix that by tapping the + button up there!</string>
 
 </resources>
