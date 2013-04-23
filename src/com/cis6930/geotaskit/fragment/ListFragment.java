@@ -2,6 +2,9 @@ package com.cis6930.geotaskit.fragment;
 
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -50,39 +53,75 @@ public class ListFragment extends Fragment {
     list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int index, long arg3) {
-			// Get task to be edited
-			Task task = items.get(index);
-			
-			// Pass data of the task as extras
-			Intent intent = new Intent(getActivity(), EditorActivity.class);
-			intent.putExtra(EditorActivity.INTENT_EDITING, true);
-			intent.putExtra(EditorActivity.INTENT_TASK_ID, task.getId());
-			intent.putExtra(EditorActivity.INTENT_TASK_PRIORITY, task.color_priority);
-			intent.putExtra(EditorActivity.INTENT_TASK_NAME, task.name);
-			intent.putExtra(EditorActivity.INTENT_TASK_DESCRIPTION, task.description);
-			intent.putExtra(EditorActivity.INTENT_TASK_LATITUDE, task.lattitude);
-			intent.putExtra(EditorActivity.INTENT_TASK_LONGITUD, task.longitude);
-			
-			// Start activity
-			startActivity(intent);
+			editTask(index);
 		}
 	});
     
     list.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-      @Override
-      public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+    	@Override
+    	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long arg3) {
+    		
+    		// build the dialog to select an action (edit, delete, or dismiss dialog)
+    		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    		//title (title of the task)
+    		builder.setTitle(items.get(index).name);
+    		// message
+    		builder.setMessage(R.string.list_dialog_task_message);
+    		// edit
+    		builder.setPositiveButton(R.string.list_dialog_task_edit, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					editTask(index);
+				}
+			});
+    		// delete
+    		builder.setNegativeButton(R.string.list_dialog_task_delete, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					removeTask(index);
+				}
+			});
+    		// edit
+    		builder.setNeutralButton(R.string.list_dialog_task_cancel, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
 
-        db.removeTask(items.get(arg2));
-        items.remove(arg2);
-
-        adapter.notifyDataSetChanged();
-
-        return true;
-      }
+    		builder.create().show();
+    		
+    		return true;
+    	}
     });
 
     return view;
+  }
+  
+  private void editTask(int index){
+		// Get task to be edited
+		Task task = items.get(index);
+		
+		// Pass data of the task as extras
+		Intent intent = new Intent(getActivity(), EditorActivity.class);
+		intent.putExtra(EditorActivity.INTENT_EDITING, true);
+		intent.putExtra(EditorActivity.INTENT_TASK_ID, task.getId());
+		intent.putExtra(EditorActivity.INTENT_TASK_PRIORITY, task.color_priority);
+		intent.putExtra(EditorActivity.INTENT_TASK_NAME, task.name);
+		intent.putExtra(EditorActivity.INTENT_TASK_DESCRIPTION, task.description);
+		intent.putExtra(EditorActivity.INTENT_TASK_LATITUDE, task.lattitude);
+		intent.putExtra(EditorActivity.INTENT_TASK_LONGITUD, task.longitude);
+		
+		// Start activity
+		startActivity(intent);
+  }
+  
+  private void removeTask(int index){
+	  // Get task to be edited
+	  Task task = items.get(index);
+	  db.removeTask(task);
+	  this.onResume();
   }
 
   @Override
