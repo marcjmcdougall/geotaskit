@@ -14,16 +14,18 @@ import com.cis6930.geotaskit.fragment.MyMapFragment;
 public class PickLocationActivity extends SherlockFragmentActivity {
   public Double latitude;
   public Double longitude;
+  private MyMapFragment f;
+  private FragmentTransaction ft;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    MyMapFragment f = new MyMapFragment();
+    f = new MyMapFragment();
     MyMapFragment.PICK_LOCATION_FOR_NEW_TASK = true;
     // FragmentTransaction is obtained in order to change the fragment in the
     // container (R.id.content at activity_main.xml) with the requested fragment
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    ft = getSupportFragmentManager().beginTransaction();
     // make the change, setting the new fragment
     ft.replace(R.id.main_content, f);
     // and commit changes to the FragmentTransaction object
@@ -38,6 +40,11 @@ public class PickLocationActivity extends SherlockFragmentActivity {
     intent.putExtra(OpenHelper.KEY_LATTITUDE, latitude);
     intent.putExtra(OpenHelper.KEY_LONGITUDE, longitude);
     setResult(RESULT_OK, intent);
+    ft = getSupportFragmentManager().beginTransaction();
+    // make the change, setting the new fragment
+    ft.remove(f);
+    // and commit changes to the FragmentTransaction object
+    ft.commit();
     finish();
   }
 }
