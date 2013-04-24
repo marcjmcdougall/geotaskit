@@ -43,6 +43,15 @@ public class LocationNotificationService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		
+		// Obtain the preferences of the user on how frequent to check for the location
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean toReschedule = prefs.getBoolean(getString(R.string.pref_user_autoupdate_key), false);
+
+		// Check whether the user changed the preference or not, if so, stop
+		if(!toReschedule)
+			stopSelf();
+		
 		// Location listener that will be called whenever the LocationManager
 		// returns a request of updated location
 		loc_listener = new LocationListener() {
