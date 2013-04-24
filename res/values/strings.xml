@@ -65,4 +65,7 @@
 	
 	<string name="guide_init_message">There are no tasks created! Let\'s fix that by tapping the + button up there!</string>
 
+	<!-- Errors -->
+	<string name="error_location_providers_not_found">GeoTaskIt: Device not capable ot getting location. Try enabling via Settings, then try again</string>
+	
 </resources>
